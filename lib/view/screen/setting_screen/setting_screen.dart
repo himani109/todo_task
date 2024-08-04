@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_project/core/controller/theme_controller.dart';
+import 'package:todo_project/core/controller/setting_controller.dart';
 import 'package:todo_project/utils/colors.dart';
 import 'package:todo_project/utils/text_style.dart';
+
+import '../../../global.dart';
+import '../../../main.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -12,115 +15,101 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  ThemeController themeController=Get.put(ThemeController());
-  final List<String> languages = ['English', 'Spanish', 'French', 'German', 'Chinese'];
-  final List<Color> colors = [Colors.blueAccent, Colors.black, Colors.deepOrangeAccent, Colors.orange, Colors.green];
-
-  String? selectedLanguage;
-  int currentColorIndex = 0;
-  List<int> containerColorIndices = List.filled(5, 0); // Five containers, each starting with color at index 0
-
-  // void changeColor(int containerIndex) {
-  //   setState(() {
-  //     containerColorIndices[containerIndex] = (containerColorIndices[containerIndex] + 1) % colors.length;
-  //     Get.changeTheme(ThemeData(primarySwatch: generateMaterialColor(color)));
-  //
-  //   });
-  // }
+  final controller = Get.put(SettingController());
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColor.cWhite,
-            )),
-        backgroundColor: Colors.blue,
-        title: Text(
-          "Setting",
-          style: pMedium16.copyWith(color: AppColor.cWhite),
+    return Obx(
+      () => Scaffold(
+        appBar: AppBar(
+          leading: InkWell(
+              onTap: () {
+                Get.back();
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: AppColor.cWhite,
+              )),
+          backgroundColor: appColor.value,
+          title: Text(
+            "setting".tr,
+            style: pMedium16.copyWith(color: AppColor.cWhite),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'App-sprache',
-                style: pRegular13,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    hint: Text('Select Language'),
-                    value: selectedLanguage,
-                    isExpanded: true,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedLanguage = newValue;
-                      });
-                      applyConditionBasedOnLanguage(newValue);
-                    },
-                    items: languages.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'app_language'.tr,
+                  style: pRegular13,
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: appColor.value.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButton<String>(
+                      hint: const Text("Select Language"),
+                      value: controller.selectedLanguage.value,
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        controller.selectedLanguage.value = newValue ?? '';
+                        if (newValue == "English") {
+                          Get.updateLocale(const Locale('en'));
+                        } else {
+                          Get.updateLocale(const Locale('de'));
+                        }
+                      },
+                      items: controller.languages
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text(
-                'App Theme',
-                style: pRegular13,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: List.generate(5, (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      themeController.changeThemeColor(colors[index]);
-
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(3),
-                      width: 60,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colors[index], // Display individual color for each container
+                const SizedBox(height: 25),
+                Text(
+                  'app_Theme'.tr,
+                  style: pRegular13,
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  children: List.generate(5, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        appColor.value = controller.colors[index];
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(3),
+                        width: 60,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: controller.colors[
+                              index], // Display individual color for each container
+                        ),
                       ),
-                    ),
-                  );
-                }),
-              ),
+                    );
+                  }),
+                ),
 
-              SizedBox(height: 20.0),
-              // ElevatedButton(
-              //   onPressed: changeColor(currentColorIndex + 1),
-              //   child: Text('Change Color'),
-              // ),
-            ],
+                const SizedBox(height: 20.0),
+                // ElevatedButton(
+                //   onPressed: changeColor(currentColorIndex + 1),
+                //   child: Text('Change Color'),
+                // ),
+              ],
+            ),
           ),
         ),
       ),

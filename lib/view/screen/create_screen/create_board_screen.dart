@@ -1,103 +1,135 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_project/core/controller/create_board_controller.dart';
+import 'package:todo_project/main.dart';
 import 'package:todo_project/utils/colors.dart';
 import 'package:todo_project/utils/text_style.dart';
 
 class CreateBoardScreen extends StatefulWidget {
+  const CreateBoardScreen({super.key});
+
   @override
   State<CreateBoardScreen> createState() => _CreateBoardScreenState();
 }
 
 class _CreateBoardScreenState extends State<CreateBoardScreen> {
-  final TextEditingController boardNameController = TextEditingController();
-  final TextEditingController desController = TextEditingController();
-  final int _maxLength = 50;
+  final controller = Get.put(CreateBoardController());
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-            onTap: () {
-              Get.back();
+    return Obx(
+      ()=> Scaffold(
+        appBar: AppBar(
+          leading: InkWell(
+              onTap: () {
+                Get.back();
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: AppColor.cWhite,
+              )),
+          backgroundColor: appColor.value,
+          title: Text(
+            "create_board".tr,
+            style: pMedium16.copyWith(color: AppColor.cWhite),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               Text(
+                'board_name'.tr,
+                style: const TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              Obx(
+                () => TextField(
+                  maxLength: 20,
+                  controller: controller.boardNameController,
+                  decoration: InputDecoration(
+                    labelStyle: pRegular12,
+                    suffixText: '${controller.nameLength.value}',
+                    border: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                    counter: const Text(''),
+                  ),
+                  onChanged: (value) {
+                    controller.nameLength.value = 20 - value.length;
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'description'.tr,
+                style: const TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              Obx(
+                () => TextField(
+                  controller: controller.desController,
+                  maxLength: 50, // Maximum length for the text field
+                  decoration: InputDecoration(
+                    counter: const Text(''),
+                    labelStyle: pRegular12,
+                    suffixText: '${controller.desLength.value}',
+                    border: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black54),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    controller.desLength.value = 50 - value.length;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: Obx(
+          ()=> FloatingActionButton.extended(
+            onPressed: () {
+              controller.saveData();
             },
-            child: Icon(
-              Icons.arrow_back,
-              color: AppColor.cWhite,
-            )),
-        backgroundColor: Colors.blue,
-        title: Text(
-          "Create Board",
-          style: pMedium16.copyWith(color: AppColor.cWhite),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: boardNameController,
-              decoration: InputDecoration(
-                labelText: 'Board Name',
-                labelStyle: pRegular12,
-                suffixText: '${boardNameController.text.length}',
-                // counterText: '${boardNameController.text.length}', // Character count indicator
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                ),
-              ),
-              onChanged: (text) {
-                setState(() {});
-              },
+            backgroundColor: (controller.desLength.value!=50&&controller.nameLength.value!=20)? appColor.value:Colors.grey.shade200,
+            shape: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(100),
+              borderSide: BorderSide.none,
             ),
-            TextField(
-              controller: desController,
-              // maxLength: _maxLength, // Maximum length for the text field
-              decoration: InputDecoration(
-                labelText: 'Description',
-                labelStyle: pRegular12,
-                suffixText: '${desController.text.length}',
-                // counterText: '${boardNameController.text.length}', // Character count indicator
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                ),
-              ),
-              onChanged: (text) {
-                setState(() {}); // Updates the character count indicator
-              },
+            icon:  Icon(
+              Icons.add,
+              color:(controller.desLength.value!=50&&controller.nameLength.value!=20)?Colors.white: Colors.black38,
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          print('Add button pressed');
-        },
-        backgroundColor: Colors.grey.shade200,
-        icon: Icon(
-          Icons.add,
-          color: Colors.black38,
-        ),
-        label: Text(
-          'Create',
-          style: TextStyle(
-            color: Colors.grey,
+            label:  Text(
+              'create'.tr,
+              style: TextStyle(
+                color:(controller.desLength.value!=50&&controller.nameLength.value!=20)?Colors.white: Colors.black38,
+              ),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

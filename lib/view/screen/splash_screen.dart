@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:todo_project/utils/text_style.dart';
 import 'package:todo_project/view/screen/intro_screen.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,23 +12,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _navigateToHomeScreen();
-
   }
 
-  _navigateToHomeScreen() async {
-    await Future.delayed(Duration(seconds: 5)); // Adjust duration as needed
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => CustomIntroScreenApp()), // Replace with your home screen widget
-    );
+  _navigateToHomeScreen()  {
+     Future.delayed(
+      const Duration(seconds: 5),
+      () {
+        Get.offAll(() => CustomIntroScreenApp());
+      },
+    ); // Adjust duration as needed
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,14 +36,20 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(child: SizedBox()),
-
-              Image.network('https://cdn-icons-png.freepik.com/512/9584/9584563.png',height:100,width: 100,),
-              SizedBox(
+              const Expanded(child: SizedBox()),
+              Image.asset(
+                'assets/images/logo.png',
+                height: 100,
+                width: 100,
+              ),
+              const SizedBox(
                 height: 15,
               ),
-              Text('Kanban Board',style: pRegular15,),
-          Expanded(child: SizedBox()),
+              Text(
+                'Kanban Board',
+                style: pRegular15,
+              ),
+              const Expanded(child: SizedBox()),
               Lottie.asset(
                 'assets/animations/animation_file.json',
                 height: 100,
